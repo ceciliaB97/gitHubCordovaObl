@@ -15,28 +15,33 @@ function buildMap(lat, lon, nom_suc, dir_suc) {
 */
 
 function crear_mapa() {
-    //aqui deben ir coordenadas de dispositivo con icono
-    document.getElementById('sucursal_mapa').innerHTML = "<div id='map' style='width: 100%; height: 50%;'></div>";
-    var map = L.map('map').setView([-34.9035723, -56.1866273], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    navigator.geolocation.getCurrentPosition(function (pos) {
+        let lat_dispositivo = pos.coords.latitude;
+        let lng_dispositivo = pos.coords.longitude;
+        //aqui deben ir coordenadas de dispositivo con icono
+        document.getElementById('sucursal_mapa').innerHTML = "<div id='map' style='width: 100%; height: 50%;'></div>";
+        var map = L.map('map').setView([lat_dispositivo, lng_dispositivo], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-    //icono personalizado mapa
-    var avatar_icon = L.icon({
-        iconUrl: 'img/icon.png',
-        shadowUrl: 'img/icon.png',
+        //icono personalizado mapa
+        var avatar_icon = L.icon({
+            iconUrl: 'img/icon.png',
+            shadowUrl: 'img/icon.png',
 
-        iconSize: [50, 43], // size of the icon
-        shadowSize: [0, 0], // size of the shadow
-        iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
-        shadowAnchor: [0, 0],  // the same for the shadow
-        popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+            iconSize: [50, 43], // size of the icon
+            shadowSize: [0, 0], // size of the shadow
+            iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+            shadowAnchor: [0, 0],  // the same for the shadow
+            popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+
+        L.marker([lat_dispositivo, lng_dispositivo], { icon: avatar_icon }).addTo(map);
+
+        return map;
     });
 
-    L.marker([-34.9035723, -56.1866273], { icon: avatar_icon }).addTo(map);
-
-    return map;
 }
 
 //pedir coordenadas de mapa - ajax
@@ -295,7 +300,7 @@ $(document).ready(function () {
         let codigo_producto = $(this).data("codigo");
         let id_producto = $(this).data("id");
         //alert(codigo_producto);
-        fn.load('temp_alta_pedido', 'pag_alta_pedido', { data: { codigo: codigo_producto, id:  id_producto} });
+        fn.load('temp_alta_pedido', 'pag_alta_pedido', { data: { codigo: codigo_producto, id: id_producto } });
     });
 
     //#region login
