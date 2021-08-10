@@ -44,6 +44,64 @@ function crear_mapa() {
 
 }
 
+function Agregar_marker_sucursal_a_mapa_2(respuesta_api) {
+    //agregar posicion del dispositivo
+    navigator.geolocation.getCurrentPosition(function (pos) {
+        //aqui deben ir coordenadas de dispositivo con icono
+        let lat_dispositivo = pos.coords.latitude;
+        let lng_dispositivo = pos.coords.longitude;
+        //crear mapa
+        document.getElementById('sucursal_mapa').innerHTML = "<div id='map' style='width: 100%; height: 50%;'></div>";
+        var map = L.map('map').setView([lat_dispositivo, lng_dispositivo], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        //icono personalizado mapa
+        var avatar_icon = L.icon({
+            iconUrl: 'img/icon.png',
+            shadowUrl: 'img/icon.png',
+
+            iconSize: [50, 43], // size of the icon
+            shadowSize: [0, 0], // size of the shadow
+            iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+            shadowAnchor: [0, 0],  // the same for the shadow
+            popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
+
+        L.marker([lat_dispositivo, lng_dispositivo], { icon: avatar_icon }).addTo(map);
+
+        //recorro sucursales
+        $.each(respuesta_api, function (pos, info_sucursal) {
+            //request coordenadas
+            $.ajax({
+                url: `https://nominatim.openstreetmap.org/search?street=${info_sucursal.direccion}&city=${info_sucursal.ciudad}&country=${info_sucursal.pais}&format=json`,
+                type: "GET",
+                dataType: "json",
+                success: function (respuesta_coords) {
+                    //ingresar a lista de datos
+                    $.each(respuesta_coords, function (pos, respuesta_coords) {
+                        //alert(info_sucursal_map.lat + " " + info_sucursal_map.lon);
+                        //mapa   
+                        L.marker([respuesta_coords.lat, respuesta_coords.lon]).addTo(map)
+                            .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}`)
+                            .openPopup()
+                    });
+    
+                },
+                error: function (xml, error, status) {
+                    ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
+                },
+                complete: function () {
+                    $("#cargando").hide();
+                }
+            });
+        });
+
+    });
+}
+
+
 //pedir coordenadas de mapa - ajax
 function Agregar_marker_sucursal_a_mapa(respuesta_api) {
     //crear mapa
