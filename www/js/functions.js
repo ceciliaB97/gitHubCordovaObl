@@ -382,7 +382,7 @@ function scanCallBack(err, text) {
     }
     QRScanner.hide();
     //si todo ok, por ejemplo el parametro text tiene https://ort-tallermoviles.herokuapp.com/api/productos?codigo=PRCODE001
-    fn.load("t_info_local", "p_info_local", { data: { url_local: text } });
+    fn.load("temp_info_producto", "pag_info_producto", { data: { url_producto: text } });
 }
 
 //#endregion login
@@ -644,7 +644,7 @@ $(document).ready(function () {
 
     $(document).on("click", "#btn_cancelar_qr", function () {
         QRScanner.hide();
-        fn.load('t_locales', 'p_locales');
+        fn.load('temp_pantalla_principal', 'pag_pantalla_principal');
     });
     //#endregion redirigir a código qr
 });

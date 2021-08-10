@@ -369,6 +369,10 @@
             <script>
                 ons.getScriptPage().onShow = function () {
                     let codigo_producto = this.data.codigo;
+                    let url_prod = this.data.url_producto;
+                    console.log(url_prod);
+                    let url_mostrar = (codigo_producto)? `https://ort-tallermoviles.herokuapp.com/api/productos?codigo=${codigo_producto}}`:url_prod
+                    console.log(url_mostrar);
                     //https://ort-tallermoviles.herokuapp.com/api/productos/1
 
                     $("#spn_txt_cargando").text('Cargando local...');
