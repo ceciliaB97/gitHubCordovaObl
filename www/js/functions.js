@@ -13,7 +13,7 @@ function enviar_request(id_pedido) {
 
         //console.log(`comentarios ${JSON.stringify(datos)}`);
         console.log(`id de pedido ${id_pedido}`);
-
+        alert(`id de pedido ${id_pedido}`);
         $.ajaxSetup({
             headers: {
                 "Content-Type": "application/json",
