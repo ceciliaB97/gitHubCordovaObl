@@ -595,7 +595,7 @@
                             });
                             $(".alta_pedido_seleccionar_sucursal").append(`</select>`);
                             //agrega la sucursal al mapa
-                            Agregar_marker_sucursal_a_mapa(sucursal_obj);
+                            Agregar_marker_sucursal_a_mapa_2(sucursal_obj);
                         },
                         error: function (xml, error, status) {
                             ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
@@ -607,7 +607,7 @@
 
                     //boton comprar
                     $("#alta_finalizar_pedido_btn").on("click", function () {
-                        if ($("#cantidad_alta_pedido").val() === null || $("#cantidad_alta_pedido").val() === 0) {
+                        if ($("#cantidad_alta_pedido").val() === null || $("#cantidad_alta_pedido").val() === "") {
                             ons.notification.toast("Debes ingresar una cantidad", { timeout: 4000 });
                         } else if ($(".alta_pedido_seleccionar_sucursal").val() === "") {
                             ons.notification.toast("Debes seleccionar una sucursal", { timeout: 4000 });
