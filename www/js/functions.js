@@ -334,6 +334,15 @@ function verificar_login() {
     }
 }
 
+function scanCallBack(err, text){
+    if(err){
+        console.log(err);
+    }
+    QRScanner.hide();
+    //si todo ok, por ejemplo el parametro text tiene https://ort-tallermoviles.herokuapp.com/api/productos?codigo=PRCODE001
+    fn.load("t_info_local","p_info_local", {data:{url_local:text}});
+}
+
 //#endregion login
 
 $(document).ready(function () {
@@ -565,4 +574,15 @@ $(document).ready(function () {
             alert("Ingrese un número mayor a 0.")
         }
     });
+
+    //#region redirigir a código qr
+    $(document).on("click","#btn_escanear_qr",function(){
+        fn.load("t_escanear_qr","p_escanear_qr");
+    });
+
+    $(document).on("click","#btn_cancelar_qr",function(){
+        QRScanner.hide();
+        fn.load('t_locales','p_locales'); 
+    });
+    //#endregion redirigir a código qr
 });

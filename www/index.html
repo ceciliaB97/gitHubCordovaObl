@@ -264,10 +264,10 @@
                 </article>
                 <ons-list id="listado_productos_ul_listado" class="list">
                 </ons-list>
-                
-            </section>    
+
+            </section>
             <ons-fab style="margin-bottom: 50px" position="bottom right">
-                <ons-icon icon="fa-qrcode"></ons-icon>
+                <ons-icon icon="fa-qrcode" id="btn_escanear_qr"></ons-icon>
             </ons-fab>
             <ons-bottom-toolbar>
                 <div style="text-align: center; line-height: 44px;">
@@ -284,6 +284,38 @@
                     </ons-toolbar-button>
                 </div>
             </ons-bottom-toolbar>
+        </ons-page>
+    </template>
+
+    <template id="t_escanear_qr">
+        <ons-page id="p_escanear_qr">
+            <script>
+               ons.getScriptPage().onInit = function(){
+                    QRScanner.prepare(onDone);
+                    function onDone(err, status){
+                        if(err){
+                            console.log(err);
+                        }
+                        if(status.authorized){
+    
+                        }
+                        if(status.denied){
+    
+                        }
+                    }
+               } 
+               ons.getScriptPage().onShow = function(){
+                    if(QRScanner){
+                        QRScanner.show(function (status){
+                            QRScanner.scan(scanCallBack);
+                        });
+                    }
+               }
+            </script>
+            <div style="height: 100%; display: flex;">
+                <img src="img/qrcode.png" style="width: 75%; display: block; margin: auto;">
+            </div>
+            <ons-button modifier="large" id="btn_cancelar_qr">Cancelar</ons-button>  
         </ons-page>
     </template>
 
@@ -371,20 +403,19 @@
                         </div>
                     </ons-card>
                 </article>
-                <ons-speed-dial position="bottom right" direction="up">
-                    <ons-fab>
-                        <ons-icon icon="fa-plus-circle"></ons-icon>
-                    </ons-fab>
-                    <ons-speed-dial-item id="spd_quitar_favorito">
-                        <ons-icon icon="md-block" onclick="eliminar_producto_favorito()">
-                        </ons-icon>
-                    </ons-speed-dial-item>
-                    <ons-speed-dial-item id="spd_agregar_favorito">
-                        <ons-icon icon="fa-star" onclick="agregar_producto_favorito()"></ons-icon>
-                    </ons-speed-dial-item>
-                </ons-speed-dial>
             </section>
-
+            <ons-speed-dial style="margin-bottom: 50px" position="bottom right" direction="up">
+                <ons-fab>
+                    <ons-icon icon="fa-plus-circle"></ons-icon>
+                </ons-fab>
+                <ons-speed-dial-item id="spd_quitar_favorito">
+                    <ons-icon icon="md-block" onclick="eliminar_producto_favorito()">
+                    </ons-icon>
+                </ons-speed-dial-item>
+                <ons-speed-dial-item id="spd_agregar_favorito">
+                    <ons-icon icon="fa-star" onclick="agregar_producto_favorito()"></ons-icon>
+                </ons-speed-dial-item>
+            </ons-speed-dial>
             <ons-bottom-toolbar>
                 <div style="text-align: center; line-height: 44px;">
                     <ons-toolbar-button>
