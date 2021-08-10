@@ -1,0 +1,22 @@
+section{
+    padding: 0 25px;
+}
+
+/*
+.page__background {
+    filter: sepia(100%);
+}
+*/
+
+#realizar_pedido_btn {
+    text-align: center; margin-top: 5px; margin-bottom: 5px;
+    margin: 0 auto;
+}
+
+input[type=number] {
+    width: 70px;
+}
+
+select {
+    border: 0px solid white;
+}
