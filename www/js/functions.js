@@ -10,17 +10,12 @@ function enviar_request(id_pedido) {
         let datos = {
             "comentario": texto_comentario
         }
-
+//                "_id": id_pedido
         //console.log(`comentarios ${JSON.stringify(datos)}`);
         console.log(`id de pedido ${id_pedido}`);
-        alert(`id de pedido ${id_pedido}`);
-        $.ajaxSetup({
-            headers: {
-                "Content-Type": "application/json",
-                "x-auth": localStorage.getItem("token"),
-                "_id": id_pedido
-            }
-        });
+        //alert(`id de pedido ${id_pedido}`);
+
+        ajax_setup();
         $.ajax({
             url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${id_pedido}`,
             type: "PUT",
@@ -31,7 +26,7 @@ function enviar_request(id_pedido) {
                 ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
             },
             error: function (xml, error, status) {
-                ons.notification.toast("xml.responseJSON.error", { timeout: 4000 });
+                ons.notification.toast(xml.responseJSON.error, { timeout: 4000 });
             },
             complete: function () {
                 $("#pedido_comentario").hide();
