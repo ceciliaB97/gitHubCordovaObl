@@ -7,31 +7,60 @@ function enviar_request(id_pedido) {
     if (texto_comentario === null) {
         ons.notification.toast("Debes ingresar un comentario", { timeout: 3000 });
     } else {
-        let datos = {
-            "comentario": texto_comentario
+        let comentario = {
+            comentario: texto_comentario
         }
-//                "_id": id_pedido
+        //                "_id": id_pedido
         //console.log(`comentarios ${JSON.stringify(datos)}`);
         console.log(`id de pedido ${id_pedido}`);
         //alert(`id de pedido ${id_pedido}`);
 
-        ajax_setup();
+        let datos = {
+            email: localStorage.getItem("email"),
+            password: localStorage.getItem("pass")
+        };
+        //JSON.stringify
+        datos = JSON.stringify(datos);
         $.ajax({
-            url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${id_pedido}`,
-            type: "PUT",
+            url: "https://ort-tallermoviles.herokuapp.com/api/usuarios/session",
+            type: "POST",
             dataType: "json",
+            contentType: "application/json",
             data: datos,
-            success: function (respuesta_comentario) {
+            success: function (respuesta) {
+                let token = respuesta.data.token;
+                $.ajaxSetup({
+                    headers: {
+                        'x-auth': token,
+                    }
+                });
+                //modal enviando pedido
+                $("#pedido_comentario").html(`<p>Enviando comentario...</p>`);
 
-                ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
+                //console.log(token);
+                //JSON.stringify    
+                comentario = JSON.stringify(comentario);
+                let un_pedido = id_pedido;
+                $.ajax({
+                    url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${un_pedido}`,
+                    type: "PUT",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: comentario,
+                    success: function (respuesta) {
+                        console.log(respuesta);
+                        ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
+                    },
+                    error: function (req_res, error, status) {
+                        console.log(req_res.responseJSON);
+                    }
+                });
             },
-            error: function (xml, error, status) {
-                ons.notification.toast(xml.responseJSON.error, { timeout: 4000 });
-            },
-            complete: function () {
-                $("#pedido_comentario").hide();
+            error: function (req_res, error, status) {
+                console.log(req_res.responseJSON);
             }
         });
+
     }
 
 }
@@ -53,7 +82,7 @@ function buildMap(lat, lon, nom_suc, dir_suc) {
         .openPopup()
 }
 */
-
+/*
 function crear_mapa() {
     navigator.geolocation.getCurrentPosition(function (pos) {
         let lat_dispositivo = pos.coords.latitude;
@@ -83,6 +112,27 @@ function crear_mapa() {
     });
 
 }
+*/
+
+function getDistance(origin, destination) {
+    // return distance in meters
+    var lon1 = toRadian(origin[1]),
+        lat1 = toRadian(origin[0]),
+        lon2 = toRadian(destination[1]),
+        lat2 = toRadian(destination[0]);
+
+    var deltaLat = lat2 - lat1;
+    var deltaLon = lon2 - lon1;
+
+    var a = Math.pow(Math.sin(deltaLat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon/2), 2);
+    var c = 2 * Math.asin(Math.sqrt(a));
+    var EARTH_RADIUS = 6371;
+    return c * EARTH_RADIUS * 1000;
+}
+function toRadian(degree) {
+    return degree*Math.PI/180;
+}
+//var distance = getDistance([lat1, lng1], [lat2, lng2])
 
 function Agregar_marker_sucursal_a_mapa_2(respuesta_api) {
     //agregar posicion del dispositivo
@@ -124,7 +174,7 @@ function Agregar_marker_sucursal_a_mapa_2(respuesta_api) {
                         //alert(info_sucursal_map.lat + " " + info_sucursal_map.lon);
                         //mapa   
                         L.marker([respuesta_coords.lat, respuesta_coords.lon]).addTo(map)
-                            .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}`)
+                            .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}<br>${(getDistance([lat_dispositivo, respuesta_coords.lon], [respuesta_coords.lat, lng_dispositivo])/1000).toFixed(2)} km`)
                             .openPopup()
                     });
 
@@ -399,7 +449,7 @@ $(document).ready(function () {
         let id_pedido = $(this).data("pedido");
         enviar_request(id_pedido);
         $("#pedido_comentario").hide();
-        fn.load('temp_listado_pedidos', 'pag_listado_pedidos');
+        fn.load('temp_pantalla_principal', 'pag_pantalla_principal');
     });
 
     //desde mis pedido comentario
