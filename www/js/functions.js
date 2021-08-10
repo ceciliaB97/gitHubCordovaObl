@@ -1,3 +1,51 @@
+//#region dialogo comentario pedido
+function showTemplateDialog(id_pedido_obj, dialog_id) {
+    var dialog = document.getElementById('my-dialog');
+
+    fn.load('temp_comentario_dialogo', 'pag_comentario_dialogo');
+
+    enviar_comentario_api(id_pedido_obj);
+};
+
+//hideDialog('pag_comentario_dialogo')
+function esconderModal(id) {
+    enviar_comentario_api(id_pedido_obj);
+    fn.load('temp_listado_pedidos', 'pag_listado_pedidos');
+};
+
+function enviar_comentario_api(id_pedido_enviar) {
+    let texto_comentario = $("#input_comentario_dialogo").val();
+
+    let datos = {
+        "comentario": texto_comentario
+    }
+
+    $.ajaxSetup({
+        headers: {
+            "Content-Type": "application/json",
+            "x-auth": localStorage.getItem("token"),
+            "_id": id_pedido_enviar
+        }
+    });
+    $.ajax({
+        url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${id_pedido_enviar}`,
+        type: "POST",
+        dataType: "json",
+        data: datos,
+        success: function (respuesta_comentario) {
+            ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
+        },
+        error: function (xml, error, status) {
+            ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
+        },
+        complete: function () {
+            $("#pantalla_cargando").hide();
+        }
+    });
+}
+
+//#endregion dialogo comentario pedido
+
 //#region mapa
 
 /*
@@ -87,13 +135,13 @@ function Agregar_marker_sucursal_a_mapa_2(respuesta_api) {
                             .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}`)
                             .openPopup()
                     });
-    
+
                 },
                 error: function (xml, error, status) {
                     ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                 },
                 complete: function () {
-                    $("#cargando").hide();
+                    $("#pantalla_cargando").hide();
                 }
             });
         });
@@ -128,7 +176,7 @@ function Agregar_marker_sucursal_a_mapa(respuesta_api) {
                 ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
             },
             complete: function () {
-                $("#cargando").hide();
+                $("#pantalla_cargando").hide();
             }
         });
     });
@@ -343,6 +391,21 @@ $(document).ready(function () {
     $(document).on("click", ".send_home", function () {
         //let id_producto = $(this).data("id");
         fn.load('temp_pantalla_principal', 'pag_pantalla_principal');
+    });
+
+    //desde mis pedido comentario
+    $(document).on("click", ".listado_pedidos_listado_class", function () {
+        let estado_coment = $(this).data("coment_state");
+        let id_pedido = $(this).data("id");
+        let id_dialogo = $(this).data("id_dialogo");
+
+        if (estado_coment === "pendiente") {
+            //muestra modal
+            $("#pedido_comentario").show();
+            //showTemplateDialog({ data: { id: id_pedido, id_dial: id_dialogo } });
+            $("#pantalla_cargando").hide();
+        }
+
     });
 
     //desde listado productos a info producto

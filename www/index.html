@@ -56,6 +56,16 @@
             </p>
         </div>
     </ons-modal>
+
+    <ons-modal direction="up" id="pedido_comentario">
+        <div style="text-align: center;">
+            <p>Agregar un comentario</p>
+            <p>
+                <input type="text" placeholder="Comentario" id="input_comentario">
+            </p>
+            <div><ons-button onclick="esconderModal('pedido_comentario')">Enviar comentario</ons-button></div>
+        </div>
+    </ons-modal>
     <!-- login -->
     <template id="temp_login">
         <ons-page id="pag_login">
@@ -156,7 +166,7 @@
                     $("#saludo").html(`Hola <strong>${usuario.nombre}</strong>`);
 
                     $("#spn_txtemp_cargando").text('Cargando producto...');
-                    $("#cargando").show();
+                    $("#pantalla_cargando").show();
                     //ajax setup 
                     ajax_setup();
                     $.ajax({
@@ -186,7 +196,7 @@
                             ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                         },
                         complete: function () {
-                            $("#cargando").hide();
+                            $("#pantalla_cargando").hide();
                         }
                     });
 
@@ -227,7 +237,7 @@
                                     ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                                 },
                                 complete: function () {
-                                    $("#cargando").hide();
+                                    $("#pantalla_cargando").hide();
                                 }
                             });
                         }
@@ -285,7 +295,7 @@
                     //https://ort-tallermoviles.herokuapp.com/api/productos/1
 
                     $("#spn_txt_cargando").text('Cargando local...');
-                    $("#cargando").show();
+                    $("#pantalla_cargando").show();
                     //ajax setup 
                     ajax_setup();
                     $.ajax({
@@ -329,7 +339,7 @@
                             ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                         },
                         complete: function () {
-                            $("#cargando").hide();
+                            $("#pantalla_cargando").hide();
                         }
                     });
                 }
@@ -427,7 +437,7 @@
                             $.each(respuesta.data, function (pos, pedido_info) {
                                 url = `https://ort-tallermoviles.herokuapp.com/assets/imgs/${pedido_info.producto.urlImagen}.jpg`;
                                 item = `
-                                    <ons-list-item modifier="chevron longdivider" tappable tap-background-color="#4FFF33" class="listado_productos_listado_class" data-id="${pedido_info.producto._id}" data-codigo="${pedido_info.producto.codigo}">
+                                    <ons-list-item modifier="chevron longdivider" tappable tap-background-color="#4FFF33" class="listado_pedidos_listado_class" data-coment_state=${pedido_info.estado} data-id="${pedido_info._id}" data-codigo="${pedido_info.producto.codigo}">
                                         <div class="list-item__left">
                                         <img class="list-item__thumbnail" src="https://ort-tallermoviles.herokuapp.com/assets/imgs/${pedido_info.producto.urlImagen}.jpg" alt="producto ${pedido_info.producto.nombre}">
                                         </div>
@@ -442,12 +452,17 @@
                                         <div class="list-item__center">
                                         <div class="list-item__title">Sucursal</div>
                                         <div class="list-item__subtitle">${pedido_info.sucursal.ciudad}, ${pedido_info.sucursal.nombre}, ${pedido_info.sucursal.direccion}t</div>
-                                        <div class="list-item__subtitle">${pedido_info.comentario}</div>
+                                        <div class="list-item__subtitle" id="lista_pedidos_comentarios-${pos}"></div>
                                         </div>
                                     </ons-list-item>
                                     `;
-
-                                $("#l_lista_productos").append(item);
+                                    $("#l_lista_productos").append(item);
+                                    //si el pedido no esta completo no mostrar comentario
+                                    if (pedido_info.estado != "pendiente") {
+                                        $(`#lista_pedidos_comentarios-${pos}`).html(`${pedido_info.comentario}`);
+                                    } else {
+                                        $(`#lista_pedidos_comentarios-${pos}`).html(`<span style="color: red;">Comentario pendiente</span>`)
+                                    }
                             });
                         },
                         error: function (xml, err, status) {
@@ -503,7 +518,7 @@
                     //https://ort-tallermoviles.herokuapp.com/api/productos/1
 
                     $("#spn_txt_cargando").text('Cargando detalles...');
-                    $("#cargando").show();
+                    $("#pantalla_cargando").show();
                     //ajax setup de info producto en alta pedido
                     ajax_setup(codigo_producto);
                     $.ajax({
@@ -570,7 +585,7 @@
                             ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                         },
                         complete: function () {
-                            $("#cargando").hide();
+                            $("#pantalla_cargando").hide();
                         }
                     });
 
@@ -582,7 +597,7 @@
                             ons.notification.toast("Debes seleccionar una sucursal", { timeout: 4000 });
                         } else {
                             $("#spn_txt_cargando").text('Enviando pedido...');
-                            $("#cargando").show();
+                            $("#pantalla_cargando").show();
                             let cantidad = $("#cantidad_alta_pedido").val();
 
                             let datos = {
@@ -609,7 +624,7 @@
                                     ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
                                 },
                                 complete: function () {
-                                    $("#cargando").hide();
+                                    $("#pantalla_cargando").hide();
                                 }
                             });
                         }
@@ -691,7 +706,7 @@
                     $("#saludo").html(`Hola <strong>${usuario.nombre}</strong>`);
 
                     $("#spn_txt_cargando").text('Cargando usuarios...');
-                    $("#cargando").show();
+                    $("#pantalla_cargando").show();
 
                     let lista_fav = localStorage.getItem("favoritos");
                     lista_fav = JSON.parse(lista_fav);
@@ -725,7 +740,7 @@
                         $("#productos_ul_listado_favoritos").append(fav1_item);
                     });
 
-                    $("#cargando").hide();
+                    $("#pantalla_cargando").hide();
                 }
             </script>
             <ons-toolbar>
