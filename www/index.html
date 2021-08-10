@@ -61,9 +61,9 @@
         <div style="text-align: center;">
             <p>Agregar un comentario</p>
             <p>
-                <input type="text" placeholder="Comentario" id="input_comentario">
+                <input type="text" placeholder="Comentario" id="input_comentario_modal">
             </p>
-            <div><ons-button onclick="esconderModal('pedido_comentario')">Enviar comentario</ons-button></div>
+            <div id="div_enviar_comentarios"></div>
         </div>
     </ons-modal>
     <!-- login -->
@@ -466,6 +466,7 @@
                             let item = "";
                             let url = "";
                             $.each(respuesta.data, function (pos, pedido_info) {
+                                //console.log("id pedido es "+ pedido_info._id);
                                 url = `https://ort-tallermoviles.herokuapp.com/assets/imgs/${pedido_info.producto.urlImagen}.jpg`;
                                 item = `
                                     <ons-list-item modifier="chevron longdivider" tappable tap-background-color="#4FFF33" class="listado_pedidos_listado_class" data-coment_state=${pedido_info.estado} data-id="${pedido_info._id}" data-codigo="${pedido_info.producto.codigo}">

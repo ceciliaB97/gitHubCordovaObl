@@ -1,47 +1,44 @@
 //#region dialogo comentario pedido
-function showTemplateDialog(id_pedido_obj, dialog_id) {
-    var dialog = document.getElementById('my-dialog');
+function enviar_request(id_pedido) {
+    //let id_ped = $(this).data("pedido");
+    //console.log("id pedido es " + id_ped);
+    let texto_comentario = $("#input_comentario_modal").val();
 
-    fn.load('temp_comentario_dialogo', 'pag_comentario_dialogo');
+    if (texto_comentario === null) {
+        ons.notification.toast("Debes ingresar un comentario", { timeout: 3000 });
+    } else {
+        let datos = {
+            "comentario": texto_comentario
+        }
 
-    enviar_comentario_api(id_pedido_obj);
-};
+        //console.log(`comentarios ${JSON.stringify(datos)}`);
+        console.log(`id de pedido ${id_pedido}`);
 
-//hideDialog('pag_comentario_dialogo')
-function esconderModal(id) {
-    enviar_comentario_api(id_pedido_obj);
-    fn.load('temp_listado_pedidos', 'pag_listado_pedidos');
-};
+        $.ajaxSetup({
+            headers: {
+                "Content-Type": "application/json",
+                "x-auth": localStorage.getItem("token"),
+                "_id": id_pedido
+            }
+        });
+        $.ajax({
+            url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${id_pedido}`,
+            type: "PUT",
+            dataType: "json",
+            data: datos,
+            success: function (respuesta_comentario) {
 
-function enviar_comentario_api(id_pedido_enviar) {
-    let texto_comentario = $("#input_comentario_dialogo").val();
-
-    let datos = {
-        "comentario": texto_comentario
+                ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
+            },
+            error: function (xml, error, status) {
+                ons.notification.toast("xml.responseJSON.error", { timeout: 4000 });
+            },
+            complete: function () {
+                $("#pedido_comentario").hide();
+            }
+        });
     }
 
-    $.ajaxSetup({
-        headers: {
-            "Content-Type": "application/json",
-            "x-auth": localStorage.getItem("token"),
-            "_id": id_pedido_enviar
-        }
-    });
-    $.ajax({
-        url: `https://ort-tallermoviles.herokuapp.com/api/pedidos/${id_pedido_enviar}`,
-        type: "POST",
-        dataType: "json",
-        data: datos,
-        success: function (respuesta_comentario) {
-            ons.notification.toast("Comentario ha sido enviado correctamente", { timeout: 4000 });
-        },
-        error: function (xml, error, status) {
-            ons.notification.toast(xml.responseJSON.description, { timeout: 4000 });
-        },
-        complete: function () {
-            $("#pantalla_cargando").hide();
-        }
-    });
 }
 
 //#endregion dialogo comentario pedido
@@ -334,13 +331,13 @@ function verificar_login() {
     }
 }
 
-function scanCallBack(err, text){
-    if(err){
+function scanCallBack(err, text) {
+    if (err) {
         console.log(err);
     }
     QRScanner.hide();
     //si todo ok, por ejemplo el parametro text tiene https://ort-tallermoviles.herokuapp.com/api/productos?codigo=PRCODE001
-    fn.load("t_info_local","p_info_local", {data:{url_local:text}});
+    fn.load("t_info_local", "p_info_local", { data: { url_local: text } });
 }
 
 //#endregion login
@@ -403,18 +400,26 @@ $(document).ready(function () {
     });
 
     //desde mis pedido comentario
+    $(document).on("click", "#btn_enviar_comentarios", function () {
+        let id_pedido = $(this).data("pedido");
+        enviar_request(id_pedido);
+        $("#pedido_comentario").hide();
+        fn.load('temp_listado_pedidos', 'pag_listado_pedidos');
+    });
+
+    //desde mis pedido comentario
     $(document).on("click", ".listado_pedidos_listado_class", function () {
         let estado_coment = $(this).data("coment_state");
         let id_pedido = $(this).data("id");
-        let id_dialogo = $(this).data("id_dialogo");
+        //console.log("el id del pedido es" + id_pedido)
 
         if (estado_coment === "pendiente") {
             //muestra modal
             $("#pedido_comentario").show();
-            //showTemplateDialog({ data: { id: id_pedido, id_dial: id_dialogo } });
-            $("#pantalla_cargando").hide();
+            $("#div_enviar_comentarios").html(`
+            <ons-button data-pedido="${id_pedido}" id="btn_enviar_comentarios">Enviar comentario</ons-button>
+            `);
         }
-
     });
 
     //desde listado productos a info producto
@@ -576,13 +581,13 @@ $(document).ready(function () {
     });
 
     //#region redirigir a código qr
-    $(document).on("click","#btn_escanear_qr",function(){
-        fn.load("t_escanear_qr","p_escanear_qr");
+    $(document).on("click", "#btn_escanear_qr", function () {
+        fn.load("t_escanear_qr", "p_escanear_qr");
     });
 
-    $(document).on("click","#btn_cancelar_qr",function(){
+    $(document).on("click", "#btn_cancelar_qr", function () {
         QRScanner.hide();
-        fn.load('t_locales','p_locales'); 
+        fn.load('t_locales', 'p_locales');
     });
     //#endregion redirigir a código qr
 });
