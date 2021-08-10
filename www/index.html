@@ -335,7 +335,7 @@
     <template id="t_escanear_qr">
         <ons-page id="p_escanear_qr">
             <script>
-                /*ons.getScriptPage().onInit = function () {
+                ons.getScriptPage().onInit = function () {
                     QRScanner.prepare(onDone);
                     function onDone(err, status) {
                         if (err) {
@@ -355,7 +355,7 @@
                             QRScanner.scan(scanCallBack);
                         });
                     }
-                }*/
+                }
             </script>
             <div style="height: 100%; display: flex;">
                 <img src="img/qrcode.png" style="width: 75%; display: block; margin: auto;">
