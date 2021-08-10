@@ -164,6 +164,7 @@
                 ons.getScriptPage().onShow = function () {
                     let usuario = sessionStorage.getItem("usuario");
                     usuario = JSON.parse(usuario);
+                    let listado_api_productos;
                     $("#saludo").html(`Hola <strong>${usuario.nombre}</strong>`);
 
                     $("#spn_txtemp_cargando").text('Cargando producto...');
@@ -175,6 +176,7 @@
                         type: "GET",
                         dataType: "json",
                         success: function (respuesta) {
+                            listado_api_productos = respuesta.data;
                             let item_producto = "";
                             $.each(respuesta.data, function (pos, producto_item) {
                                 item = `
@@ -201,14 +203,15 @@
                         }
                     });
 
-                    $(document).on("click", "#listado_productos_btn", function () {
-                        let buscar = $("#listado_productos_filtrar").val();
+                    $(document).on("input", "#listado_productos_filtrar", function () {
+                        let buscar = $("#listado_productos_filtrar").val().toLowerCase();
+                        let filtrar_x = $("#filtrar_por_x").val();
 
-                        if (buscar === "") {
+                        if (buscar === "" || buscar.indexOf("[") != -1 || buscar.indexOf("]") != -1) {
                             ons.notification.toast("Debe ingresar un producto", { timeout: 4000 });
-                        } else {
+                        } else if (filtrar_x === "nombre") {
                             //vaciar html
-                            $("#listado_productos_ul_listado").html(``);
+                            $("#listado_productos_ul_listado").empty();
                             //ajax setup 
                             ajax_setup();
                             $.ajax({
@@ -241,6 +244,45 @@
                                     $("#pantalla_cargando").hide();
                                 }
                             });
+                        } else if (filtrar_x === "etiqueta") {
+                            //vaciar html
+                            $("#listado_productos_ul_listado").html(``);
+                            //buscar por etiquetas con lista de objetos guardada
+                            let resultado_busqueda = [];
+                            let producto = {};
+                            let etiquetas_busq = {};
+                            let nombre_et = "";
+                            for (i = 0; i < listado_api_productos.length; i++) {
+                                producto = listado_api_productos[i];
+                                etiquetas_busq = producto.etiquetas;
+                                for (m = 0; m < etiquetas_busq.length; m++) {
+                                    nombre_et = etiquetas_busq[m].toLowerCase();
+                                    //si el nombre de local contiene lo que me va ingresando en el input buscar.
+                                    if (nombre_et.indexOf(buscar) != -1) {
+                                        resultado_busqueda.push(producto);
+                                        i++;
+                                    }
+                                }
+
+                            }
+                            //console.log(nombre_et);
+                            $("#listado_productos_ul_listado").empty();
+                            $.each(resultado_busqueda, function (pos, producto_item) {
+                                item = `
+                                    <ons-list-item modifier="chevron longdivider" tappable tap-background-color="#4FFF33" class="listado_productos_listado_class" data-id="${producto_item._id}" data-codigo="${producto_item.codigo}">
+                                        <div class="list-item__left">
+                                        <img class="list-item__thumbnail" src="https://ort-tallermoviles.herokuapp.com/assets/imgs/${producto_item.urlImagen}.jpg" alt="producto ${producto_item.nombre}">
+                                        </div>
+    
+                                        <div class="list-item__center">
+                                        <div class="list-item__title">${producto_item.nombre}</div>
+                                        <div class="list-item__subtitle">${producto_item.precio}</div>
+                                        <div class="list-item__subtitle">${producto_item.estado}</div>
+                                        </div>
+                                    </ons-list-item>
+                                    `;
+                                $("#listado_productos_ul_listado").append(item);
+                            });
                         }
 
                     });
@@ -256,10 +298,12 @@
             <section>
                 <article>
                     <p id="saludo"></p>
-                    <p>Filtrar por productos</p>
+                    <select id="filtrar_por_x">
+                        <option value="nombre">Filtrar por nombre</option>
+                        <option value="etiqueta">Filtrar por etiqueta</option>
+                    </select>
                     <p><input type="text" class="text-input text-input--material" placeholder="Producto"
-                            id="listado_productos_filtrar">&nbsp;<ons-button id="listado_productos_btn">Buscar
-                        </ons-button>
+                            id="listado_productos_filtrar">
                     </p>
 
                 </article>
@@ -489,13 +533,13 @@
                                         </div>
                                     </ons-list-item>
                                     `;
-                                    $("#l_lista_productos").append(item);
-                                    //si el pedido no esta completo no mostrar comentario
-                                    if (pedido_info.estado != "pendiente") {
-                                        $(`#lista_pedidos_comentarios-${pos}`).html(`${pedido_info.comentario}`);
-                                    } else {
-                                        $(`#lista_pedidos_comentarios-${pos}`).html(`<span style="color: red;">Comentario pendiente</span>`)
-                                    }
+                                $("#l_lista_productos").append(item);
+                                //si el pedido no esta completo no mostrar comentario
+                                if (pedido_info.estado != "pendiente") {
+                                    $(`#lista_pedidos_comentarios-${pos}`).html(`${pedido_info.comentario}`);
+                                } else {
+                                    $(`#lista_pedidos_comentarios-${pos}`).html(`<span style="color: red;">Comentario pendiente</span>`)
+                                }
                             });
                         },
                         error: function (xml, err, status) {

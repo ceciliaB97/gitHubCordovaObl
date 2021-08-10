@@ -386,12 +386,24 @@ function scanCallBack(err, text) {
 }
 
 //#endregion login
-
+//document ready
 $(document).ready(function () {
     //DOM ready => se puede manipular elementos html desde JS
     //alert('ready');
     inicializar_favoritos();
     verificar_login();
+
+    //se le va la conexion
+    document.addEventListener("offline", function() {
+        ons.notification.toast("Se ha quedado sin conexi&oacute;n a internet...", {timeout:3000});
+    }, false);
+
+    //vuelve la conexion
+    document.addEventListener("online", function() {
+     const tipo_conexion =  navigator.connection.type;
+     navigator.vibrate(3000);
+     ons.notification.toast(`Se ha detectado conexi&oacute;n a internet, conectado a ${tipo_conexion}`, {timeout:3000});
+    }, false);
 
     //function CONFIRM
     $(document).on("click", ".sign_out", function () {
