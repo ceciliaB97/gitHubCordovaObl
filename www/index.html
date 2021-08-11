@@ -370,9 +370,9 @@
                 ons.getScriptPage().onShow = function () {
                     let codigo_producto = this.data.codigo;
                     let url_prod = this.data.url_producto;
-                    console.log(url_prod);
+                    console.log(`QRScanner url es ` + url_prod);
                     let url_mostrar = (codigo_producto)? `https://ort-tallermoviles.herokuapp.com/api/productos?codigo=${codigo_producto}}`:url_prod
-                    console.log(url_mostrar);
+                    console.log(`URL_producto es ` + url_mostrar);
                     //https://ort-tallermoviles.herokuapp.com/api/productos/1
 
                     $("#spn_txt_cargando").text('Cargando local...');
@@ -396,6 +396,7 @@
                                 //https://onsen.io/v2/api/js/ons-icon.html
                                 $("#producto_info_span_precio").html(`<ons-icon icon="fa-dollar-sign"></ons-icon>&nbsp;${producto_respuesta.precio}`);
                                 $("#producto_info_span_estado").html(`<ons-icon icon="fa-box"></ons-icon>&nbsp;${producto_respuesta.estado}`);
+                                $("#producto_info_span_etiquetas").empty();
                                 $.each(producto_respuesta.etiquetas, function (pos, producto_etiqueta) {
                                     $("#producto_info_span_etiquetas").append(`<p>#${producto_respuesta.etiquetas[pos]}</p>`);
                                 });
@@ -455,7 +456,7 @@
             </section>
             <ons-speed-dial style="margin-bottom: 50px" position="bottom right" direction="up">
                 <ons-fab>
-                    <ons-icon icon="fa-plus-circle"></ons-icon>
+                    <ons-icon icon="fa-plus-circle" onclick="habilitar_deshabilitar_boton_fav()"></ons-icon>
                 </ons-fab>
                 <ons-speed-dial-item id="spd_quitar_favorito">
                     <ons-icon icon="md-block" onclick="eliminar_producto_favorito()">

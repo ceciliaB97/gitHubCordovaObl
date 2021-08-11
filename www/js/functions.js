@@ -124,13 +124,13 @@ function getDistance(origin, destination) {
     var deltaLat = lat2 - lat1;
     var deltaLon = lon2 - lon1;
 
-    var a = Math.pow(Math.sin(deltaLat/2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon/2), 2);
+    var a = Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
     var c = 2 * Math.asin(Math.sqrt(a));
     var EARTH_RADIUS = 6371;
     return c * EARTH_RADIUS * 1000;
 }
 function toRadian(degree) {
-    return degree*Math.PI/180;
+    return degree * Math.PI / 180;
 }
 //var distance = getDistance([lat1, lng1], [lat2, lng2])
 
@@ -174,7 +174,7 @@ function Agregar_marker_sucursal_a_mapa_2(respuesta_api) {
                         //alert(info_sucursal_map.lat + " " + info_sucursal_map.lon);
                         //mapa   
                         L.marker([respuesta_coords.lat, respuesta_coords.lon]).addTo(map)
-                            .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}<br>${(getDistance([lat_dispositivo, respuesta_coords.lon], [respuesta_coords.lat, lng_dispositivo])/1000).toFixed(2)} km`)
+                            .bindPopup(`<strong>${info_sucursal.nombre}</strong><br>${info_sucursal.direccion}<br>${(getDistance([lat_dispositivo, respuesta_coords.lon], [respuesta_coords.lat, lng_dispositivo]) / 1000).toFixed(2)} km`)
                             .openPopup()
                     });
 
@@ -258,12 +258,23 @@ function inicializar_favoritos() {
     }
 }
 
-function buscar_producto(id_producto) {
+function habilitar_deshabilitar_boton_fav() {
+    console.log(buscar_producto(datos_producto));
+    if (buscar_producto(datos_producto) === null) {
+        $("#spd_quitar_favorito").attr('disabled', true);
+        $("#spd_agregar_favorito").attr('disabled', false);
+    } else {
+        $("#spd_quitar_favorito").attr('disabled', false);
+        $("#spd_agregar_favorito").attr('disabled', true);
+    }
+}
+
+function buscar_producto(datos_producto) {
     let favoritos = JSON.parse(localStorage.getItem("favoritos"));
     let usr = {};
     for (i = 0; i < favoritos.length; i++) {
         usr = favoritos[i];
-        if (usr.id == id_producto) {
+        if (usr.data[0]._id === datos_producto.data[0]._id) {
             return usr;
         }
     }
@@ -276,7 +287,7 @@ function eliminar_favorito(datos_producto) {
     let usr = {};
     for (i = 0; i < favoritos.length; i++) {
         usr = favoritos[i];
-        if (usr.id == datos_producto.id) {
+        if (usr.data[0]._id === datos_producto.data[0]._id) {
             favoritos.splice(i, 1);
             break;
         }
@@ -285,6 +296,7 @@ function eliminar_favorito(datos_producto) {
 }
 
 function eliminar_producto_favorito() {
+    //console.log(datos_producto.data[0]._id);
     eliminar_favorito(datos_producto);
     ons.notification.toast("El producto se elimin&oacute; correctamente de favoritos", { timeout: 3000 });
     $("#spd_quitar_favorito").attr('disabled', true);
@@ -292,6 +304,7 @@ function eliminar_producto_favorito() {
 }
 
 function agregar_favorito(datos_producto) {
+    //console.log(datos_producto.data[0]._id);
     let favoritos = JSON.parse(localStorage.getItem("favoritos"));
     favoritos.push(datos_producto);
     localStorage.setItem("favoritos", JSON.stringify(favoritos));
@@ -394,15 +407,15 @@ $(document).ready(function () {
     verificar_login();
 
     //se le va la conexion
-    document.addEventListener("offline", function() {
-        ons.notification.toast("Se ha quedado sin conexi&oacute;n a internet...", {timeout:3000});
+    document.addEventListener("offline", function () {
+        ons.notification.toast("Se ha quedado sin conexi&oacute;n a internet...", { timeout: 3000 });
     }, false);
 
     //vuelve la conexion
-    document.addEventListener("online", function() {
-     const tipo_conexion =  navigator.connection.type;
-     navigator.vibrate(3000);
-     ons.notification.toast(`Se ha detectado conexi&oacute;n a internet, conectado a ${tipo_conexion}`, {timeout:3000});
+    document.addEventListener("online", function () {
+        const tipo_conexion = navigator.connection.type;
+        navigator.vibrate(3000);
+        ons.notification.toast(`Se ha detectado conexi&oacute;n a internet, conectado a ${tipo_conexion}`, { timeout: 3000 });
     }, false);
 
     //function CONFIRM
