@@ -5486,7 +5486,8 @@ util$1.createElement = function (html) {
   if (html instanceof DocumentFragment) {
     wrapper.appendChild(document.importNode(html, true));
   } else {
-	  $.find('script').remove(); /*cambios*/
+	  $(wrapper).find('script').remove(); /*cambios*/
+    
     wrapper.innerHTML = html.trim();
   }
 
